@@ -11,7 +11,6 @@
 
 using namespace std;
 
-
 vector<string> findHtmlFiles(vector<string> allFiles) {
 	regex reg1(".+html$", regex_constants::icase);
 	vector<string> htmlFiles;
@@ -48,7 +47,35 @@ vector<tuple<string,TagType>> findTag(string path) {
 	return tags;
 }
 
+string extractUrl(string tag) {
+	regex reg(".+?(src|href)=(\"|')(.+?)\\2.+");
+	smatch match;
+	string result;
+	if (regex_match(tag, match, reg)) {
+		result = match[match.size() - 1];
+	}
+	return result;
+}
+
+string extractVersionNum(string url) {
+	regex reg("\\.(js|css)\\?.+");
+	string result;
+	if (!regex_search(url, reg)) {
+		return result;
+	}
+	regex reg1(".+?(\\?|&)source_version=([^&$]+).*");
+	smatch match;
+	if ( !regex_match(url,match,reg1)) {
+		return result;
+	}
+	return match[match.size()-1];
+}
+
+
 int main() {
+	//auto versionNum = extractVersionNum("abc.js?source_version=2");
+	//cout << versionNum << endl;
+	//cin.get();
 	vector<string> files;
 	getAllFiles("C:\\Users\\宏鸿\\Desktop\\手游社区\\in-game Community (1)", files);
 	vector<string> htmlPaths = findHtmlFiles(files);
@@ -59,7 +86,8 @@ int main() {
 			for (int i = 0; i < tags.size(); i++) {
 				auto tag = get<0>(tags[i]);
 				auto tagType = get<1>(tags[i]);
-				cout << tag << endl;
+				auto url = extractUrl(tag);
+				cout << url << endl;
 			}
 		}
 	}
