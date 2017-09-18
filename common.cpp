@@ -69,8 +69,8 @@ vector<string> getFiles(string cate_dir) {
 }
 
 
-void saveFile(string content) {
-	string path = "C:\\Users\\ºêºè\\Desktop\\test.txt";
+void saveFile(string content, string path) {
+	//string path = "C:\\Users\\ºêºè\\Desktop\\test.txt";
 	ofstream outfile;
 	outfile.open(path);
 	if (!outfile)

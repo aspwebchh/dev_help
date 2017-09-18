@@ -30,6 +30,6 @@ bool exists(string val, string str);
 string fileContent(string path);
 void getAllFiles(string path, vector<string>& files);
 vector<string> getFiles(string cate_dir);
-void saveFile(string content);
+void saveFile(string content, string path);
 string int2String(int value);
 string replaceAll(std::string str, const std::string from, const std::string to);

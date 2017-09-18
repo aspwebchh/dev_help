@@ -11,19 +11,12 @@
 #include <time.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <windows.h>
+#include  <direct.h>  
 
 using namespace std;
 
 const string SOURCE_VERSION = "source_version";
-
-void testSave() {
-	FILE *fp = fopen("C:\\Users\\宏鸿\\Desktop\\test.txt", "wt+");
-	string x = "123";
-	x.append("bcd");
-
-	fputs(x.c_str(), fp);
-	fclose(fp);
-}
 
 string extractUrl(string tag) {
 	regex reg(".+?(src|href)=(\"|')(.+?)\\2.+");
@@ -33,6 +26,12 @@ string extractUrl(string tag) {
 		result = match[match.size() - 1];
 	}
 	return result;
+}
+
+string getCurrWorkPath() {
+	char buffer[MAX_PATH];
+	_getcwd(buffer, MAX_PATH);
+	return string(buffer);
 }
 
 tuple<string, UrlType> extractVersionNum(string url) {
@@ -60,7 +59,7 @@ string newVersionNum() {
 	auto min = int2String(tim->tm_min);
 	auto sec = int2String(tim->tm_sec);
 	delete tim;
-	return year + month + day + hour + min + day;
+	return year + month + day + hour + min + sec;
 }
 
 vector<string> findHtmlFiles(vector<string> allFiles) {
@@ -100,10 +99,10 @@ void updateVersionNum(string filePath, string fileContent, vector<TagStruct> tag
 	for (int i = 0; i < tagDataList.size(); i++) {
 		auto tagItem = tagDataList[i];
 		auto newUrl = genUrlWithVersionNum(tagItem.url, tagItem.urlType);
-		auto newTag = replaceAll(tagItem.tagHtml, tagItem.url, newUrl);;
+		auto newTag = replaceAll(tagItem.tagHtml, tagItem.url, newUrl);
 		fileContent = replaceAll(fileContent, tagItem.tagHtml, newTag);
 	}
-	saveFile(fileContent);
+	saveFile(fileContent, filePath);
 }
 
 vector<TagStruct> findTag(string htmlPath, string content, string regexString, TagType tagType) {
@@ -143,18 +142,19 @@ vector<TagStruct> findTag(string path) {
 	return tags;
 }
 
-
 int main() {
+	cout << getCurrWorkPath() << endl;
+	cin.get();
+
 	vector<string> files;
-	getAllFiles("C:\\Users\\宏鸿\\Desktop\\手游社区\\in-game Community (1)", files);
+	//getAllFiles("C:\\Users\\宏鸿\\Desktop\\手游社区\\in-game Community (1)", files);
+	getAllFiles("C:\\Users\\宏鸿\\Desktop\\test", files);
 	auto htmlPaths = findHtmlFiles(files);
 	for (int i = 0; i < htmlPaths.size(); i++) {
 		auto path = htmlPaths[i];
-		if (exists("test.html", path)) {
-			auto tags = findTag(path);
-			for (int i = 0; i < tags.size(); i++) {
-				auto item = tags[i];
-			}
+		auto tags = findTag(path);
+		for (int i = 0; i < tags.size(); i++) {
+			auto item = tags[i];
 		}
 	}
 	cin.get();
