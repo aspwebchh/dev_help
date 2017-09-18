@@ -45,9 +45,34 @@ void getAllFiles(string path, vector<string>& files) {
 	}
 }
 
+vector<string> getFiles(string cate_dir) {
+	string path = cate_dir;
+	cate_dir = cate_dir + "\\*";
+	vector<string> files;//存放文件名  
+	_finddata_t file;
+	long lf;
+	//输入文件夹路径  
+	if ((lf = _findfirst(cate_dir.c_str(), &file)) == -1) {
+		cout << cate_dir << " not found!!!" << endl;
+	}
+	else {
+		while (_findnext(lf, &file) == 0) {
+			//输出文件名  
+			//cout<<file.name<<endl;  
+			if (strcmp(file.name, ".") == 0 || strcmp(file.name, "..") == 0)
+				continue;
+			files.push_back(path + "\\" + file.name);
+		}
+	}
+	_findclose(lf);
+	return files;
+}
+
 
 void saveFile(string content) {
-	ofstream outfile("C:\\Users\\宏鸿\\Desktop\\手游社区\\in-game Community (1)\\1.txt", ios::ate);
+	string path = "C:\\Users\\宏鸿\\Desktop\\test.txt";
+	ofstream outfile;
+	outfile.open(path);
 	if (!outfile)
 	{
 		cout << "txt文件打开失败!" << endl;

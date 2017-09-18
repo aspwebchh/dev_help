@@ -9,10 +9,21 @@
 #include <regex>
 #include <tuple>
 #include <time.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 using namespace std;
 
 const string SOURCE_VERSION = "source_version";
+
+void testSave() {
+	FILE *fp = fopen("C:\\Users\\ºêºè\\Desktop\\test.txt", "wt+");
+	string x = "123";
+	x.append("bcd");
+
+	fputs(x.c_str(), fp);
+	fclose(fp);
+}
 
 string extractUrl(string tag) {
 	regex reg(".+?(src|href)=(\"|')(.+?)\\2.+");
@@ -52,8 +63,6 @@ string newVersionNum() {
 	return year + month + day + hour + min + day;
 }
 
-
-
 vector<string> findHtmlFiles(vector<string> allFiles) {
 	regex reg1(".+html$", regex_constants::icase);
 	vector<string> htmlFiles;
@@ -88,22 +97,16 @@ string genUrlWithVersionNum(string url, UrlType urlType) {
 }
 
 void updateVersionNum(string filePath, string fileContent, vector<TagStruct> tagDataList) {
-	auto content = fileContent;
 	for (int i = 0; i < tagDataList.size(); i++) {
 		auto tagItem = tagDataList[i];
 		auto newUrl = genUrlWithVersionNum(tagItem.url, tagItem.urlType);
-		//auto newTag = replaceAll(tagItem.tagHtml, tagItem.url, newUrl);
-		//content = replaceAll(content, tagItem.url, newUrl);
-		//cout << content.find(tagItem.url, 0) << endl;
-		//cout << content.find(tagItem.url, 0) << endl;
-		// cout << content.find(tagItem.url, 0) << endl;
-		content.replace(content.find(tagItem.url, 0),tagItem.url.length(), newUrl);
+		auto newTag = replaceAll(tagItem.tagHtml, tagItem.url, newUrl);;
+		fileContent = replaceAll(fileContent, tagItem.tagHtml, newTag);
 	}
-	saveFile(content);
+	saveFile(fileContent);
 }
 
-vector<TagStruct> findTag(string htmlPath, string regexString, TagType tagType) {
-	string content = fileContent(htmlPath);
+vector<TagStruct> findTag(string htmlPath, string content, string regexString, TagType tagType) {
 	regex reg(regexString, regex_constants::icase);
 	vector<TagStruct> newResult;
 	for (sregex_iterator it(content.begin(), content.end(), reg), end; it != end; ++it) {
@@ -121,7 +124,6 @@ vector<TagStruct> findTag(string htmlPath, string regexString, TagType tagType) 
 
 		newResult.push_back(tagStruct);
 	}
-	updateVersionNum(htmlPath, content, newResult);
 	return newResult;
 }
 
@@ -133,12 +135,13 @@ vector<TagStruct> mergeTags(vector<TagStruct> v1, vector<TagStruct> v2) {
 }
 
 vector<TagStruct> findTag(string path) {
-	auto scriptTags = findTag(path, "<script.+?<\/script>", script);
-	auto linkTags = findTag(path, "<link[^>]+>", style);
+	string content = fileContent(path);
+	auto scriptTags = findTag(path, content, "<script.+?<\/script>", script);
+	auto linkTags = findTag(path, content, "<link[^>]+>", style);
 	auto tags = mergeTags(scriptTags, linkTags);
+	updateVersionNum(path, content, tags);
 	return tags;
 }
-
 
 
 int main() {
@@ -151,7 +154,6 @@ int main() {
 			auto tags = findTag(path);
 			for (int i = 0; i < tags.size(); i++) {
 				auto item = tags[i];
-				//cout << item.url << "|" << item.versionNum << "|" << item.urlType << endl;
 			}
 		}
 	}
