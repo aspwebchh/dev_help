@@ -161,8 +161,8 @@ vector<TagStruct> mergeTags(vector<TagStruct> v1, vector<TagStruct> v2) {
 
 vector<TagStruct> findTag(string path) {
 	const auto content = fileContent(path);
-	const auto scriptTags = findTag(path, content, "<script.+?<\/script>", script);
- 	const auto linkTags = findTag(path, content, "<link[^>]+>", style);
+	const auto scriptTags = findTag(path, content, "<script.+?src=.+?<\/script>", script);
+ 	const auto linkTags = findTag(path, content, "<link.+?href\\s*=\\s*([\"']?).+?\\1.*?>", style);
 	const auto tags = mergeTags(scriptTags, linkTags);
 
 	TagsAndContent tagsAndContent;
@@ -188,12 +188,17 @@ void previewFile( string htmlFilePath, vector<TagStruct> tags ) {
 
 
 int main() {
+	cout << "文件分析中..." << endl;
 	vector<string> files;
+	//getAllFiles("Z:\\chh\\gm\\application\\views\\td_query", files);
 	getAllFiles(getCurrWorkPath(), files);
 	const auto htmlPaths = findHtmlFiles(files);
 	for (int i = 0; i < htmlPaths.size(); i++) {
 		auto path = htmlPaths[i];
 		auto tags = findTag(path);
+		//for (int i = 0; i < tags.size(); i++) {
+		//	cout << tags[i].tagHtml << endl;
+		//}
 		previewFile(path,tags);
 	}
 	cout << "是否更新请输入Y/N" << endl;
