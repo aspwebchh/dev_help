@@ -85,7 +85,7 @@ string newVersionNum() {
 }
 
 vector<string> findHtmlFiles(vector<string> allFiles) {
-	regex reg1(".+html$", regex_constants::icase);
+	regex reg1(".+(html|php|jsp|aspx|asp|htm)$", regex_constants::icase);
 	vector<string> htmlFiles;
 	for (int i = 0; i < allFiles.size(); i++) {
 		string path = allFiles[i];
@@ -178,7 +178,7 @@ void previewFile( string htmlFilePath, vector<TagStruct> tags ) {
 	if (tags.size() == 0) {
 		return;
 	}
-	cout << "html文件：" << htmlFilePath << " 文件中有以下静态资源" << endl;
+	cout << "文件：" << htmlFilePath << " 中有以下静态资源" << endl;
 	for (int i = 0; i < tags.size(); i++) {
 		const auto item = tags[i];
 		cout << "    " << item.url << endl;
@@ -208,6 +208,7 @@ int main() {
 			const auto tagsAndContent = FileData::findContent(path);
 			updateVersionNum(path, tagsAndContent.content, tagsAndContent.tagData);
 		}
+		cout << "更新完成" << endl;
 		while (true);
 	}
 	return 0;
