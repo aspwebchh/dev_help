@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ConsoleApplication1", "ConsoleApplication1.vcxproj", "{77305A4C-A753-4BD7-9C18-5F5855891B8F}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dev_help", "ConsoleApplication1.vcxproj", "{77305A4C-A753-4BD7-9C18-5F5855891B8F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,8 +15,8 @@ Global
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{77305A4C-A753-4BD7-9C18-5F5855891B8F}.Debug|x64.ActiveCfg = Debug|x64
 		{77305A4C-A753-4BD7-9C18-5F5855891B8F}.Debug|x64.Build.0 = Debug|x64
-		{77305A4C-A753-4BD7-9C18-5F5855891B8F}.Debug|x86.ActiveCfg = Debug|Win32
-		{77305A4C-A753-4BD7-9C18-5F5855891B8F}.Debug|x86.Build.0 = Debug|Win32
+		{77305A4C-A753-4BD7-9C18-5F5855891B8F}.Debug|x86.ActiveCfg = Release|Win32
+		{77305A4C-A753-4BD7-9C18-5F5855891B8F}.Debug|x86.Build.0 = Release|Win32
 		{77305A4C-A753-4BD7-9C18-5F5855891B8F}.Release|x64.ActiveCfg = Release|x64
 		{77305A4C-A753-4BD7-9C18-5F5855891B8F}.Release|x64.Build.0 = Release|x64
 		{77305A4C-A753-4BD7-9C18-5F5855891B8F}.Release|x86.ActiveCfg = Release|Win32

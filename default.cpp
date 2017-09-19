@@ -12,11 +12,33 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <windows.h>
-#include  <direct.h>  
+#include <direct.h>  
+#include <map>
 
 using namespace std;
 
 const string SOURCE_VERSION = "source_version";
+
+
+class FileData {
+private:
+	static map<string, TagsAndContent> dataSource;
+
+public:
+
+	static void add(string path, TagsAndContent tagsAndContent) {
+		dataSource.insert(pair<string, TagsAndContent>(path, tagsAndContent));
+	}
+	static TagsAndContent findContent(string path) {
+		map<string, TagsAndContent>::iterator result = dataSource.find(path);
+		if (result != dataSource.end()) {
+			return result->second;
+		}
+	}
+};
+
+map<string, TagsAndContent> FileData::dataSource;
+
 
 string extractUrl(string tag) {
 	regex reg(".+?(src|href)=(\"|')(.+?)\\2.+");
@@ -96,6 +118,9 @@ string genUrlWithVersionNum(string url, UrlType urlType) {
 }
 
 void updateVersionNum(string filePath, string fileContent, vector<TagStruct> tagDataList) {
+	if (tagDataList.size() == 0) {
+		return;
+	}
 	for (int i = 0; i < tagDataList.size(); i++) {
 		auto tagItem = tagDataList[i];
 		auto newUrl = genUrlWithVersionNum(tagItem.url, tagItem.urlType);
@@ -103,6 +128,7 @@ void updateVersionNum(string filePath, string fileContent, vector<TagStruct> tag
 		fileContent = replaceAll(fileContent, tagItem.tagHtml, newTag);
 	}
 	saveFile(fileContent, filePath);
+	cout << "文件 " << filePath << " 更新成功"  << endl;
 }
 
 vector<TagStruct> findTag(string htmlPath, string content, string regexString, TagType tagType) {
@@ -134,29 +160,55 @@ vector<TagStruct> mergeTags(vector<TagStruct> v1, vector<TagStruct> v2) {
 }
 
 vector<TagStruct> findTag(string path) {
-	string content = fileContent(path);
-	auto scriptTags = findTag(path, content, "<script.+?<\/script>", script);
-	auto linkTags = findTag(path, content, "<link[^>]+>", style);
-	auto tags = mergeTags(scriptTags, linkTags);
-	updateVersionNum(path, content, tags);
+	const auto content = fileContent(path);
+	const auto scriptTags = findTag(path, content, "<script.+?<\/script>", script);
+ 	const auto linkTags = findTag(path, content, "<link[^>]+>", style);
+	const auto tags = mergeTags(scriptTags, linkTags);
+
+	TagsAndContent tagsAndContent;
+	tagsAndContent.content = content;
+	tagsAndContent.tagData = tags;
+	FileData::add(path, tagsAndContent);
+
 	return tags;
 }
 
-int main() {
-	cout << getCurrWorkPath() << endl;
-	cin.get();
 
+void previewFile( string htmlFilePath, vector<TagStruct> tags ) {
+	if (tags.size() == 0) {
+		return;
+	}
+	cout << "html文件：" << htmlFilePath << " 文件中有以下静态资源" << endl;
+	for (int i = 0; i < tags.size(); i++) {
+		const auto item = tags[i];
+		cout << "    " << item.url << endl;
+	}
+	cout << endl;
+}
+
+
+int main() {
 	vector<string> files;
-	//getAllFiles("C:\\Users\\宏鸿\\Desktop\\手游社区\\in-game Community (1)", files);
-	getAllFiles("C:\\Users\\宏鸿\\Desktop\\test", files);
-	auto htmlPaths = findHtmlFiles(files);
+	getAllFiles(getCurrWorkPath(), files);
+	const auto htmlPaths = findHtmlFiles(files);
 	for (int i = 0; i < htmlPaths.size(); i++) {
 		auto path = htmlPaths[i];
 		auto tags = findTag(path);
-		for (int i = 0; i < tags.size(); i++) {
-			auto item = tags[i];
-		}
+		previewFile(path,tags);
 	}
-	cin.get();
+	cout << "是否更新请输入Y/N" << endl;
+
+	string confirm;
+	cin >> confirm;
+	transform(confirm.begin(), confirm.end(), confirm.begin(), ::toupper);
+
+	if (confirm == "Y") {
+		for (int i = 0; i < htmlPaths.size(); i++) {
+			const auto path = htmlPaths[i];
+			const auto tagsAndContent = FileData::findContent(path);
+			updateVersionNum(path, tagsAndContent.content, tagsAndContent.tagData);
+		}
+		while (true);
+	}
 	return 0;
 }
